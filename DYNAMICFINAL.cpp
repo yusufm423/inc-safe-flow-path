@@ -6,6 +6,101 @@ struct pathinfo
     vector<vector<int>> safety;
 };
 
+struct TrieNode *getNode();
+
+struct TrieNode
+{
+    vector<TrieNode *> children;
+    int data;
+    int rank;
+    bool isEndOfWord;
+} *root = getNode();
+
+struct TrieNode *getNode(void)
+{
+    struct TrieNode *pNode = new TrieNode;
+
+    pNode->isEndOfWord = false;
+    pNode->data = -1;
+    pNode->rank = -1;
+
+    return pNode;
+}
+
+void insert(struct TrieNode *root, vector<int> key, int rank)
+{
+    struct TrieNode *pCrawl = root;
+
+    for (int i = 0; i < key.size(); i++)
+    {
+        int flag = 0;
+        for (int j = 0; j < pCrawl->children.size(); j++)
+        {
+            if (pCrawl->children[j]->data == key[i])
+            {
+                flag = 1;
+                pCrawl = pCrawl->children[j];
+                break;
+            }
+        }
+        if (flag == 0)
+        {
+            struct TrieNode *temp = getNode();
+            pCrawl->children.push_back(temp);
+            pCrawl->children[pCrawl->children.size() - 1]->data = key[i];
+            pCrawl = temp;
+        }
+    }
+
+    // mark last node as leaf
+    pCrawl->isEndOfWord = true;
+    pCrawl->rank = rank;
+    // cout<<pCrawl->rank<<"\n";
+}
+
+void display(struct TrieNode *root)
+{
+    struct TrieNode *pCrawl = root;
+
+    while (true)
+    {
+        cout << pCrawl->data << "\t";
+        if (pCrawl->isEndOfWord)
+        {
+            break;
+        }
+        pCrawl = pCrawl->children[pCrawl->children.size() - 1];
+    }
+}
+
+int search(struct TrieNode *root, vector<int> key)
+{
+    struct TrieNode *pCrawl = root;
+
+    for (int i = 0; i < key.size(); i++)
+    {
+        int flag = 0;
+        for (int j = 0; j < pCrawl->children.size(); j++)
+        {
+            if (pCrawl->children[j]->data == key[i])
+            {
+                flag = 1;
+                pCrawl = pCrawl->children[j];
+                break;
+            }
+        }
+        if (flag == 0)
+        {
+            return -1;
+        }
+    }
+    if (pCrawl->isEndOfWord != true)
+    {
+        return -1;
+    }
+    return pCrawl->rank;
+}
+
 void dfs(vector<vector<int>> &g, vector<vector<int>> &flows, vector<int> &path, map<pair<int, int>, int> &w, int u, int min)
 {
     while (1)
@@ -13,6 +108,7 @@ void dfs(vector<vector<int>> &g, vector<vector<int>> &flows, vector<int> &path, 
         if (u == g.size() - 1)
         {
             path.push_back(u);
+            insert(root, path, flows.size());
             flows.push_back(path);
             for (int i = 0; i < path.size() - 1; i++)
             {
@@ -71,24 +167,6 @@ int binarySearch(vector<int> &nums, int target)
     return r + 1;
 }
 
-void print_weights(map<pair<int, int>, int> w, int n)
-{
-    cout << "\t";
-    for (int i = 0; i < n; i++)
-        cout << i << "\t";
-    cout << endl;
-    for (int i = 0; i < n; i++)
-    {
-        cout << i << "\t";
-        for (int j = 0; j < n; j++)
-        {
-            cout << w[pair<int, int>(i, j)] << "\t";
-        }
-        cout << endl;
-    }
-    cout << endl;
-}
-
 void calculate_safe_static(vector<int> &path, map<pair<int, int>, int> &w, int outdegree[], pathinfo *p)
 {
     int l = 0, r = 0;
@@ -105,7 +183,6 @@ void calculate_safe_static(vector<int> &path, map<pair<int, int>, int> &w, int o
         {
             int t = r - 1;
             p->safety.push_back(vector<int>{l, t, sR});
-            cout<<"<"<<l<<" , "<<r-1<<">\n"<<sR<<endl;
         }
 
         while (sR <= 0 && r <= path.size() - 1)
@@ -114,7 +191,6 @@ void calculate_safe_static(vector<int> &path, map<pair<int, int>, int> &w, int o
             sR = sR - (w[{path[l - 1], path[l]}] - (outdegree[path[l]] - w[{path[l], path[l + 1]}])) + w[{path[l], path[l + 1]}];
         }
     }
-    cout<<endl;
 }
 
 void check_for_new_paths(vector<int> &path, map<pair<int, int>, int> &w, int outdegree[], pathinfo *p, int safepathno)
@@ -371,6 +447,21 @@ int handle_intersectingpath(vector<int> &diverge, vector<int> path, map<int, pai
     }
 }
 
+void print_safeflows(vector<vector<int>> &flows, vector<pathinfo> &p)
+{
+    for (int k = 0; k < flows.size(); k++)
+    {
+        cout << "\n\nk = " << k;
+        for (auto x : p[k].safety)
+        {
+            cout << "\n<" << x[0] << " , " << x[1] << ">";
+            cout << "\n"
+                 << x[2];
+        }
+    }
+    cout << endl;
+}
+
 int main()
 {
     int n, m;
@@ -412,14 +503,15 @@ int main()
 
     flowDecomp(g, flows, path, w, 0);
 
-    struct pathinfo pathno[flows.size()];
+    vector<pathinfo> pathno(flows.size());
 
     cout << "---------Calculating safe paths using Static Algo---------\n";
     for (int i = 0; i < flows.size(); i++)
     {
-        cout<<"k="<<i<<endl;
         calculate_safe_static(flows[i], w, outdegree, &pathno[i]);
     }
+
+    print_safeflows(flows, pathno);
 
     // Update
     while (true)
@@ -427,54 +519,68 @@ int main()
         int exitstatus, b, rank;
         cout << "Select one of the following:\n";
         cout << "0 -> Terminate program\n";
-        cout << "1 -> Incrementally compute on an existing Flow path.\n";
+        cout << "1 -> Incrementally compute on a Flow path.\n";
 
         cin >> exitstatus;
         if (!exitstatus)
         {
             exit(0);
         }
-        if (exitstatus != 1)
+
+        if (exitstatus == 1)
+        {
+            // // Paths printed;
+            // cout << "S.no. \tFlow\n";
+            // for (int x = 0; x < flows.size(); x++)
+            // {
+            //     cout << x << "\t";
+            //     for (auto i : flows[x])
+            //     {
+            //         cout << i << " ";
+            //     }
+            //     cout << endl;
+            // }
+
+            path = {0, 1, 7, 16, 9, 51};
+            rank = search(root, path);
+            if (rank == -1)
+            {
+                cout<<"This is a new path\n";
+                rank = flows.size();
+                cout<<rank<<endl;
+                insert(root, path, rank);
+                flows.push_back(path);
+                pathno.resize(flows.size());
+                exitstatus=2;
+            }
+            else
+            {
+                cout<<"This is an existing path\n";
+                path = flows[rank];
+            }
+        }
+        else
         {
             cout << "Invalid selection\n";
             exit(0);
         }
 
-        // Paths printed;
-        cout << "S.no. \t Flow\n";
-
-        for (int x = 0; x < flows.size(); x++)
-        {
-            cout << x << "\t";
-            for (auto i : flows[x])
-            {
-                cout << i << " ";
-            }
-            cout << endl;
-        }
-
-        cout << "Select an existing path from given flow decompositions = ";
-        cin >> rank;
-        cout << endl;
+        cout << "Enter flow increment value (b) = ";
+        cin >> b;
 
         if (rank >= flows.size())
         {
             cout << "Invalid flow selection\n";
             continue;
         }
-
-        cout << "Enter flow increment value (b) = ";
-        cin >> b;
-
         if (b < 0)
         {
             cout << "Increment value should be +ve\n";
             continue;
         }
 
-        path = flows[rank];
-
         map<int, pair<int, int>> present;
+        int size;
         for (int i = 0; i < path.size() - 1; i++)
         {
             present[path[i]] = {1, path[i + 1]};
@@ -483,28 +589,35 @@ int main()
         }
         present[path[path.size() - 1]] = {1, -1};
 
-        int size = pathno[rank].safety.size();
-        for (int i = 0; i < size; i++)
+        if (exitstatus == 1)
         {
-            if (pathno[rank].safety[i][2] <= 0 && pathno[rank].safety[i][2] > -b)
+            size = pathno[rank].safety.size();
+            for (int i = 0; i < size; i++)
             {
-                right_extension(flows[rank], w, outdegree, &pathno[rank], i, b);
+                if (pathno[rank].safety[i][2] <= 0 && pathno[rank].safety[i][2] > -b)
+                {
+                    right_extension(flows[rank], w, outdegree, &pathno[rank], i, b);
+                }
+                else
+                {
+                    pathno[rank].safety[i][2] += b;
+                }
             }
-            else
+            for (int i = 0; i < pathno[rank].safety.size(); i++)
             {
-                pathno[rank].safety[i][2] += b;
+                check_for_new_paths(flows[rank], w, outdegree, &pathno[rank], i);
             }
-        }
-        for (int i = 0; i < pathno[rank].safety.size(); i++)
-        {
-            check_for_new_paths(flows[rank], w, outdegree, &pathno[rank], i);
-        }
 
-        for (int i = 0; i < pathno[rank].safety.size(); i++)
+            for (int i = 0; i < pathno[rank].safety.size(); i++)
+            {
+                bool flag = check_redundancy(&pathno[rank], i);
+                if (flag == 1)
+                    i--;
+            }
+        }
+        else if (exitstatus == 2)
         {
-            bool flag = check_redundancy(&pathno[rank], i);
-            if (flag == 1)
-                i--;
+            calculate_safe_static(flows[rank], w, outdegree, &pathno[rank]);
         }
 
         // divergence handling
@@ -533,16 +646,6 @@ int main()
             }
         }
 
-        for (int k = 0; k < flows.size(); k++)
-        {
-            cout << "\n\nk = " << k;
-            for (auto x : pathno[k].safety)
-            {
-                cout << "\n<" << x[0] << " , " << x[1] << ">";
-                cout << "\n"
-                     << x[2];
-            }
-        }
-        cout<<endl;
+        print_safeflows(flows, pathno);
     }
 }
