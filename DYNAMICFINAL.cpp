@@ -154,25 +154,25 @@ int binarySearch(vector<int> &nums, int target)
 void calculate_safe_static(vector<int> &path, map<pair<int, int>, int> &w, int outdegree[], pathinfo *p)
 {
     int l = 0, r = 0;
-    int sR = 0;
-    sR = w[{path[l], path[l + 1]}];
+    int fp = 0;
+    fp = w[{path[l], path[l + 1]}];
     r++;
     while (r < path.size())
     {
-        while (sR > 0 && r < path.size())
+        while (fp > 0 && r < path.size())
         {
-            sR = sR - (outdegree[path[r]] - w[{path[r], path[r + 1]}]);
+            fp = fp - (outdegree[path[r]] - w[{path[r], path[r + 1]}]);
             r++;
         }
         {
             int t = r - 1;
-            p->safety.push_back(vector<int>{l, t, sR});
+            p->safety.push_back(vector<int>{l, t, fp});
         }
 
-        while (sR <= 0 && r <= path.size() - 1)
+        while (fp <= 0 && r <= path.size() - 1)
         {
             l++;
-            sR = sR - (w[{path[l - 1], path[l]}] - (outdegree[path[l]] - w[{path[l], path[l + 1]}])) + w[{path[l], path[l + 1]}];
+            fp = fp - (w[{path[l - 1], path[l]}] - (outdegree[path[l]] - w[{path[l], path[l + 1]}])) + w[{path[l], path[l + 1]}];
         }
     }
 }
@@ -181,22 +181,22 @@ void check_for_new_paths(vector<int> &path, map<pair<int, int>, int> &w, int out
 {
     int l = p->safety[safepathno][0];
     int r = p->safety[safepathno][1] + 1;
-    int sR = p->safety[safepathno][2];
-    while (r < path.size() && sR <= 0)
+    int fp = p->safety[safepathno][2];
+    while (r < path.size() && fp <= 0)
     {
         if (l == r - 1)
             return;
 
-        while (sR <= 0 && l < path.size() - 1)
+        while (fp <= 0 && l < path.size() - 1)
         {
             l++;
-            sR = sR - (w[{path[l - 1], path[l]}] - (outdegree[path[l]] - w[{path[l], path[l + 1]}])) + w[{path[l], path[l + 1]}];
+            fp = fp - (w[{path[l - 1], path[l]}] - (outdegree[path[l]] - w[{path[l], path[l + 1]}])) + w[{path[l], path[l + 1]}];
         }
-        sR = sR - (outdegree[path[r]] - w[{path[r], path[r + 1]}]);
+        fp = fp - (outdegree[path[r]] - w[{path[r], path[r + 1]}]);
         r++;
-        while (sR > 0 && r < path.size())
+        while (fp > 0 && r < path.size())
         {
-            sR = sR - (outdegree[path[r]] - w[{path[r], path[r + 1]}]);
+            fp = fp - (outdegree[path[r]] - w[{path[r], path[r + 1]}]);
             r++;
         }
         // if <l,r-1> doesn't exist in safety report it, else no new paths emerged
@@ -211,7 +211,7 @@ void check_for_new_paths(vector<int> &path, map<pair<int, int>, int> &w, int out
 
         if (!flag)
         {
-            p->safety.push_back(vector<int>{l, r - 1, sR});
+            p->safety.push_back(vector<int>{l, r - 1, fp});
         }
     }
 }
@@ -220,24 +220,24 @@ void right_extension(vector<int> &path, map<pair<int, int>, int> &w, int outdegr
 {
     int l = p->safety[safepathno][0];
     int r = p->safety[safepathno][1] + 1;
-    int sR = p->safety[safepathno][2];
+    int fp = p->safety[safepathno][2];
 
-    sR += b;
-    while (sR > 0 && r < path.size())
+    fp += b;
+    while (fp > 0 && r < path.size())
     {
-        sR = sR - (outdegree[path[r]] - w[{path[r], path[r + 1]}]);
+        fp = fp - (outdegree[path[r]] - w[{path[r], path[r + 1]}]);
         r++;
     }
 
     p->safety[safepathno][1] = r - 1;
-    p->safety[safepathno][2] = sR;
+    p->safety[safepathno][2] = fp;
 }
 
 bool check_redundancy(pathinfo *p, int safepathno)
 {
     int l = p->safety[safepathno][0];
     int r = p->safety[safepathno][1] + 1;
-    int sR = p->safety[safepathno][2];
+    int fp = p->safety[safepathno][2];
 
     int temp = p->safety.size() - 1;
     while (temp > safepathno)
@@ -280,30 +280,30 @@ void divergence(vector<int> &diverge, vector<int> currpath, map<int, pair<int, i
     }
 }
 
-void new_subpaths(vector<int> &diverge, vector<int> path, map<pair<int, int>, int> &w, int outdegree[], pathinfo *p, int loc, int &l, int &r, int &sR)
+void new_subpaths(vector<int> &diverge, vector<int> path, map<pair<int, int>, int> &w, int outdegree[], pathinfo *p, int loc, int &l, int &r, int &fp)
 {
-    while (sR <= 0 && r <= loc)
+    while (fp <= 0 && r <= loc)
     {
         if (l == r - 1)
             return;
 
-        while (sR <= 0 && l < r)
+        while (fp <= 0 && l < r)
         {
             l++;
-            sR = sR - (w[{path[l - 1], path[l]}] - (outdegree[path[l]] - w[{path[l], path[l + 1]}])) + w[{path[l], path[l + 1]}];
+            fp = fp - (w[{path[l - 1], path[l]}] - (outdegree[path[l]] - w[{path[l], path[l + 1]}])) + w[{path[l], path[l + 1]}];
         }
-        sR = sR - (outdegree[path[r]] - w[{path[r], path[r + 1]}]);
+        fp = fp - (outdegree[path[r]] - w[{path[r], path[r + 1]}]);
         r++;
 
-        while (sR > 0 && r < path.size())
+        while (fp > 0 && r < path.size())
         {
-            sR = sR - (outdegree[path[r]] - w[{path[r], path[r + 1]}]);
+            fp = fp - (outdegree[path[r]] - w[{path[r], path[r + 1]}]);
             r++;
         }
 
         {
             int t = r - 1;
-            p->safety.push_back(vector<int>{l, t, sR});
+            p->safety.push_back(vector<int>{l, t, fp});
         }
     }
     check_for_new_paths(path, w, outdegree, p, p->safety.size() - 1);
@@ -313,22 +313,22 @@ int handle_intersectingpath(vector<int> &diverge, vector<int> path, map<int, pai
 {
     int l = p->safety[safepathno][0];
     int r = p->safety[safepathno][1] + 1;
-    int sR = p->safety[safepathno][2];
+    int fp = p->safety[safepathno][2];
 
     if (diverge.empty())
     {
         if (present[path[l]].first == 1 && present[path[l + 1]].first == 1 && present[path[r]].first == 1)
         {
             // right extension(merging of safepaths)
-            sR += b;
-            while (sR > 0 && r < path.size())
+            fp += b;
+            while (fp > 0 && r < path.size())
             {
-                sR = sR - (outdegree[path[r]] - w[{path[r], path[r + 1]}]);
+                fp = fp - (outdegree[path[r]] - w[{path[r], path[r + 1]}]);
                 r++;
             }
             p->safety[safepathno][0] = l;
             p->safety[safepathno][1] = r - 1;
-            p->safety[safepathno][2] = sR;
+            p->safety[safepathno][2] = fp;
         }
         // else no change in safe path (completely diff route)
         return 0;
@@ -342,31 +342,31 @@ int handle_intersectingpath(vector<int> &diverge, vector<int> path, map<int, pai
         {
             return 0;
         }
-        sR += b;
+        fp += b;
     }
-    sR = sR - (r_ - l_) * b;
+    fp = fp - (r_ - l_) * b;
     if (r_ == l_ && present[path[l + 1]].first != 1)
     {
         return 0;
     }
 
-    if ((sR > 0 && p->safety[safepathno][2] > 0) || (sR <= 0 && p->safety[safepathno][2] < 0))
+    if ((fp > 0 && p->safety[safepathno][2] > 0) || (fp <= 0 && p->safety[safepathno][2] < 0))
     {
-        if (sR <= 0 && p->safety[safepathno][2] <= 0)
+        if (fp <= 0 && p->safety[safepathno][2] <= 0)
         {
-            if (sR + (outdegree[path[r - 1]] - w[{path[r - 1], path[r]}]) <= 0)
+            if (fp + (outdegree[path[r - 1]] - w[{path[r - 1], path[r]}]) <= 0)
             {
                 // path has shrunk
                 int temp = r;
                 int flag = 0;
 
-                while (sR <= 0)
+                while (fp <= 0)
                 {
-                    sR = sR + (outdegree[path[temp - 1]] - w[{path[temp - 1], path[temp]}]);
+                    fp = fp + (outdegree[path[temp - 1]] - w[{path[temp - 1], path[temp]}]);
                     temp--;
                 }
                 temp++;
-                sR = sR - (outdegree[path[temp - 1]] - w[{path[temp - 1], path[temp]}]);
+                fp = fp - (outdegree[path[temp - 1]] - w[{path[temp - 1], path[temp]}]);
 
                 if (r != temp)
                 {
@@ -377,26 +377,26 @@ int handle_intersectingpath(vector<int> &diverge, vector<int> path, map<int, pai
                 // new path <l,temp-1>
                 {
                     int t = temp - 1;
-                    p->safety.push_back(vector<int>{l, t, sR});
+                    p->safety.push_back(vector<int>{l, t, fp});
                 }
 
-                new_subpaths(diverge, path, w, outdegree, p, diverge[r_ - 1], l, temp, sR);
+                new_subpaths(diverge, path, w, outdegree, p, diverge[r_ - 1], l, temp, fp);
                 return flag;
             }
-            p->safety[safepathno][2] = sR;
+            p->safety[safepathno][2] = fp;
             check_for_new_paths(path, w, outdegree, p, safepathno);
         }
         else
         {
-            p->safety[safepathno][2] = sR;
+            p->safety[safepathno][2] = fp;
             return 0;
         }
     }
     else
     {
-        if (sR > 0)
+        if (fp > 0)
         {
-            p->safety[safepathno][2] = sR;
+            p->safety[safepathno][2] = fp;
             right_extension(path, w, outdegree, p, safepathno, 0);
         }
         else
@@ -405,13 +405,13 @@ int handle_intersectingpath(vector<int> &diverge, vector<int> path, map<int, pai
             int temp = r;
             int flag = 0;
 
-            while (sR <= 0)
+            while (fp <= 0)
             {
-                sR = sR + (outdegree[path[temp - 1]] - w[{path[temp - 1], path[temp]}]);
+                fp = fp + (outdegree[path[temp - 1]] - w[{path[temp - 1], path[temp]}]);
                 temp--;
             }
             temp++;
-            sR = sR - (outdegree[path[temp - 1]] - w[{path[temp - 1], path[temp]}]);
+            fp = fp - (outdegree[path[temp - 1]] - w[{path[temp - 1], path[temp]}]);
 
             if (r != temp)
             {
@@ -422,10 +422,10 @@ int handle_intersectingpath(vector<int> &diverge, vector<int> path, map<int, pai
             // new path <l,temp-1>
             {
                 int t = temp - 1;
-                p->safety.push_back(vector<int>{l, t, sR});
+                p->safety.push_back(vector<int>{l, t, fp});
             }
 
-            new_subpaths(diverge, path, w, outdegree, p, diverge[r_ - 1], l, temp, sR);
+            new_subpaths(diverge, path, w, outdegree, p, diverge[r_ - 1], l, temp, fp);
             return flag;
         }
     }

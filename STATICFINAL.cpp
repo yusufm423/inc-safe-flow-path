@@ -50,25 +50,25 @@ void calculate_safe(vector<int> path, map<pair<int, int>, int> &w, int outdegree
 {
 
     int l = 0, r = 0;
-    int sR = 0;
-    sR = w[{path[l], path[l + 1]}];
+    int fp = 0;
+    fp = w[{path[l], path[l + 1]}];
     r++;
     while (r < path.size())
     {
-        while (sR > 0 && r < path.size())
+        while (fp > 0 && r < path.size())
         {
-            sR = sR - (outdegree[path[r]] - w[{path[r], path[r + 1]}]);
+            fp = fp - (outdegree[path[r]] - w[{path[r], path[r + 1]}]);
             r++;
         }
 
         cout << "<" << l << " , " << r - 1 << ">\n";
-        cout << sR << "\n";
+        cout << fp << "\n";
 
-        while (sR <= 0 && r <= path.size() - 1)
+        while (fp <= 0 && r <= path.size() - 1)
         {
             l++;
-            sR = sR - (w[{path[l - 1], path[l]}] - (outdegree[path[l]] - w[{path[l], path[l + 1]}])) + w[{path[l], path[l + 1]}];
-            // cout<<"l = "<<l<<"sR = "<<sR<<endl;
+            fp = fp - (w[{path[l - 1], path[l]}] - (outdegree[path[l]] - w[{path[l], path[l + 1]}])) + w[{path[l], path[l + 1]}];
+            // cout<<"l = "<<l<<"fp = "<<fp<<endl;
         }
     }
     cout << endl;
