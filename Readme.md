@@ -12,7 +12,7 @@ The aim of this project is to design and implement a dynamic algorithm to verify
 We present this simple algorithm to improve the time complexity from $O(m^2n)$ for static algorithm to $O(Δp)$, where Δp is the number of safe path changed due to above operations. We also implement both the static as well as its incremental version in C++ and compare their run time over randomly generated flow networks.
 
 ### Applications
-We have seen in [1] a possible application of such partial and reliable solution (safe path) is to consider them as constrains of real RNA transcript assemblers, to guide the assembly process of such heuristics. Another possible application could be to evaluate the accuracy of assemblers (does the output contain safe and complete solution). 
+We have seen in [^1] a possible application of such partial and reliable solution (safe path) is to consider them as constrains of real RNA transcript assemblers, to guide the assembly process of such heuristics. Another possible application could be to evaluate the accuracy of assemblers (does the output contain safe and complete solution). 
 
 ## References
 [1]S. Khan, M. Kortelainen, M. Cáceres, L. Williams, and A. I. Tomescu, “Safety and Completeness in Flow Decompositions for RNA Assembly,” arXiv.org, Jan. 25, 2022. https://arxiv.org/abs/2201.10372 (accessed Aug. 11, 2022).
