@@ -27,7 +27,7 @@ struct TrieNode *getNode(void)
     return pNode;
 }
 
-void insert(struct TrieNode *root, vector<int> key, int rank)
+void trie_insert(struct TrieNode *root, vector<int> key, int rank)
 {
     struct TrieNode *pCrawl = root;
 
@@ -55,25 +55,9 @@ void insert(struct TrieNode *root, vector<int> key, int rank)
     // mark last node as leaf
     pCrawl->isEndOfWord = true;
     pCrawl->rank = rank;
-    // cout<<pCrawl->rank<<"\n";
 }
 
-void display(struct TrieNode *root)
-{
-    struct TrieNode *pCrawl = root;
-
-    while (true)
-    {
-        cout << pCrawl->data << "\t";
-        if (pCrawl->isEndOfWord)
-        {
-            break;
-        }
-        pCrawl = pCrawl->children[pCrawl->children.size() - 1];
-    }
-}
-
-int search(struct TrieNode *root, vector<int> key)
+int trie_search(struct TrieNode *root, vector<int> key)
 {
     struct TrieNode *pCrawl = root;
 
@@ -108,7 +92,7 @@ void dfs(vector<vector<int>> &g, vector<vector<int>> &flows, vector<int> &path, 
         if (u == g.size() - 1)
         {
             path.push_back(u);
-            insert(root, path, flows.size());
+            trie_insert(root, path, flows.size());
             flows.push_back(path);
             for (int i = 0; i < path.size() - 1; i++)
             {
@@ -494,7 +478,6 @@ int main()
         {
             outdegree[i] += w[pair<int, int>(i, j)];
         }
-        // cout << outdegree[i] << endl;
     }
     cout << endl;
 
@@ -529,33 +512,31 @@ int main()
 
         if (exitstatus == 1)
         {
-            // // Paths printed;
-            // cout << "S.no. \tFlow\n";
-            // for (int x = 0; x < flows.size(); x++)
-            // {
-            //     cout << x << "\t";
-            //     for (auto i : flows[x])
-            //     {
-            //         cout << i << " ";
-            //     }
-            //     cout << endl;
-            // }
-
-            path = {0, 1, 7, 16, 9, 51};
-            rank = search(root, path);
+            // how the input is taken totally depends on the user. Here we assume the user types it in, user may read input from file as well.
+            int vsize,temp;
+            path.clear();
+            cout << "Enter the number of nodes in flow = ";
+            cin>>vsize;
+            cout << "Enter the flow = ";
+            for(int i=0;i<vsize;i++){
+                cin>>temp;
+                path.push_back(temp);
+            }
+            
+            rank = trie_search(root, path);
             if (rank == -1)
             {
-                cout<<"This is a new path\n";
+                cout << "This is a new path\n";
                 rank = flows.size();
-                cout<<rank<<endl;
-                insert(root, path, rank);
+                cout << rank << endl;
+                trie_insert(root, path, rank);
                 flows.push_back(path);
                 pathno.resize(flows.size());
-                exitstatus=2;
+                exitstatus = 2;
             }
             else
             {
-                cout<<"This is an existing path\n";
+                cout << "This is an existing path\n";
                 path = flows[rank];
             }
         }
