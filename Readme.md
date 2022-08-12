@@ -25,20 +25,36 @@ Once this is done, each flow decomposition is selected one at a time and a two-p
 
 ### Dynamic Algorithm
 
-Here, we aim to store the excess flow fp as it will determine whether a path is safe or not. fp values are generally stored non-positive as its value is stored after path becomes unsafe, but if it is positive then it means that path has ended (we are at the sink). In order to do so, we created a vector of structure/class named pathinfo to store all the maximal safe path of each flow decomposition. Within each structure/class, a 2D table is used. A row of {l,r,fp} is pushed into the table, where l,r and fp are sufficient conditions to identify a maximal safe path. The idea is that if flow is increased over a flow decomposition or a new edge is added, we can recover the values l,r and fp to verify and further enumerate if the earlier safe path is safe after update or not.<br>
+Here, we aim to store the excess flow fp as it will determine whether a path is safe or not. fp values are generally stored non-positive as its value is stored after path becomes unsafe, but if it is positive then it means that path has ended (we are at the sink). In order to do so, we created a vector of structure/class named pathinfo to store all the maximal safe path of each flow decomposition. Within each structure/class, a 2D table is used. A row of {l,r,fp} is pushed into the table, where l,r and fp are sufficient conditions to identify a maximal safe path. The idea is that if flow is increased over a flow decomposition or a new edge is added, we can recover the values l,r and fp to verify and further enumerate if the earlier safe path is safe after update or not. **Outflow**: Consider a path X ={u1,u2,...uk} and ui∈P, then outflow at ui is the sum of all valid weighted edges (ui,v), where v≠ui+1. <br>
 If we look furhter into this approach, we find that this problem can be further categorized into 2 sub-problems:
 <br>(i) right_extension():
 
 ```
 1. Retrieve stored values of safe path i.e. l,r,fp.
 2. Increment the value of fp with input flow.
-3. Repeat until fp>0 and r doesn't cross sink.
+3. Repeat until fp>0 and r doesn't cross sink node.
     a. fp = fp - (outflow at r).
     b. Increment r.
 4. Store values l,r,fp back into table.
 ```
 
-<br>(ii) handle_intersecting_path():
+<br>(ii) new_subpath():
+```
+1. Repeat until fp<=0 and r crosses last diverge node
+    a. Repeat until fp<=0 :
+        i. increment l
+        ii. fp = fp - (weighted edge {l-1, l} - (outflow at l)) + (weighted edge {l, l+1})
+    b. fp = fp -(outflow at r)
+    c. increment r
+    d. Repeat until fp>0 and r doesn't cross sink node.
+        i. fp = fp - (outflow at r)
+        ii. increment r
+    e. Traverse over table of maximal path and check if a safe path {l,r} exist
+    f. If safe path {l,r} does not exist in table, then save values l,r,fp into the table of maximal safe path and go to step 1.
+    g. return
+```
+
+<br>(iii) handle_intersecting_path():
 
 ```
 Require: array diverge[], user entered flow b
@@ -57,10 +73,10 @@ Require: array diverge[], user entered flow b
             II. fp = fp + (outflow at r)
             III. go to step I. if fp<=0
             IV. fp = fp - (outflow at r)
-            V. Store l,r,fp and call new_subpaths().
+            V. Store l,r,fp and call new_subpath().
         ii. else 
             I. store value of fp.
-            II. call check_for_new_paths().
+            II. call check_for_new_path().
     b. else store value of fp.
 6. else 
     a. if fp>0:
@@ -70,10 +86,11 @@ Require: array diverge[], user entered flow b
         ii. fp = fp + (outflow at r)
         iii. go to i. if fp<=0
         iv. fp = fp - (outflow at r)
-        v. Store l,r,fp and call new_subpaths().
+        v. Store l,r,fp and call new_subpath().
 ```
 
 <br>Any other flow decomposition that is neither an intersecting path nor the updated path itself, such paths remain unchanged and hence are left untouched. By using this approach, we achieve less computation than static algorithm already. This technique helps us to reduce time complexity to the number of safe path changed over m updates = $O(Δp)$.
+
 
 ## Implementation in C++
 
@@ -91,7 +108,10 @@ The above incremental algorithm is implemented using STL by creating a structure
 <br>
 <p>(vi) handle_intersectingpath(): This function uses divergence() to find if P intersects (diverges) at any node with current processing path and determines according to above pseudocode whether the safe path shrinks, extends or doesn't change.</p>
 <br>
-<p>(vii) new_subpaths() and check_for_new_paths(): When a safe path breaks into multiple safe path, these multiple safe path are calculated using these two functions. These functions are called until left pointer l crosses last diverging node.</p>
+<p>(vii) new_subpath() and check_for_new_path(): When a safe path breaks into multiple safe path, these multiple safe path are calculated using these two functions. These functions are called until left pointer l crosses last diverging node.</p>
+
+## Conclusion and Future Works
+In this project we saw how we built upon static algorithm and succesfully proposed an incremental algorithm of time complexity $O(Δp)$ by verifying and enumerating maximal safe path, by saving their sufficient conditions, i.e. l,r and fp. The above mentioned algorithm is accurate but has room for improvement left which will be dealt with in future updates. This work can be further extended to a decremental algorithm for computation of safe flow path, which is out of scope of this project.
 
 ## References
 
