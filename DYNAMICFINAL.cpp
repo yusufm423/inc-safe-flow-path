@@ -213,7 +213,9 @@ void check_for_new_path(vector<int> &path, map<pair<int, int>, int> &w, int outd
         if (!flag)
         {
             p->safety.push_back(vector<int>{l, r - 1, fp});
+            continue;
         }
+        return;
     }
 }
 

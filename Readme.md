@@ -25,8 +25,10 @@ Once this is done, each flow decomposition is selected one at a time and a two-p
 
 ### Dynamic Algorithm
 
-Here, we aim to store the excess flow fp as it will determine whether a path is safe or not. fp values are generally stored non-positive as its value is stored after path becomes unsafe, but if it is positive then it means that path has ended (we are at the sink). In order to do so, we created a vector of structure/class named pathinfo to store all the maximal safe path of each flow decomposition. Within each structure/class, a 2D table is used. A row of {l,r,fp} is pushed into the table, where l,r and fp are sufficient conditions to identify a maximal safe path. The idea is that if flow is increased over a flow decomposition or a new edge is added, we can recover the values l,r and fp to verify and further enumerate if the earlier safe path is safe after update or not. **Outflow**: Consider a path X ={u1,u2,...uk} and ui∈P, then outflow at ui is the sum of all valid weighted edges (ui,v), where v≠ui+1. <br>
-If we look furhter into this approach, we find that this problem can be further categorized into 2 sub-problems:
+Here, we aim to store the excess flow fp as it will determine whether a path is safe or not. fp values are generally stored non-positive as its value is stored after path becomes unsafe, but if it is positive then it means that path has ended (we are at the sink). In order to do so, we created a vector of structure/class named pathinfo to store all the maximal safe path of each flow decomposition. Within each structure/class, a 2D table is used. A row of {l,r,fp} is pushed into the table, where l,r and fp are sufficient conditions to identify a maximal safe path. The idea is that if flow is increased over a flow decomposition or a new edge is added, we can recover the values l,r and fp to verify and further enumerate if the earlier safe path is safe after update or not. **Outflow**: Consider a path $X ={u_1,u_2,...u_k}$ and ${u_i}$,${u_{i+1}}∈X$, then outflow at i (i is pointing to ${u_i}$) is the sum of all weighted edges $(u_i,v)$, where ${v≠u_{i+1}}$. <br>
+$$outflow~at~i = \sum_{i=0}^{n} (u_i,v), where~ {v≠u_{i+1}}$$
+<br>
+If we look furhter into this approach, we find that this problem can be further categorized into 3 sub-problems:
 <br>(i) right_extension():
 
 ```
@@ -39,6 +41,7 @@ If we look furhter into this approach, we find that this problem can be further 
 ```
 
 <br>(ii) new_subpath():
+
 ```
 1. Repeat until fp<=0 and r crosses last diverge node
     a. Repeat until fp<=0 :
@@ -74,11 +77,11 @@ Require: array diverge[], user entered flow b
             III. go to step I. if fp<=0
             IV. fp = fp - (outflow at r)
             V. Store l,r,fp and call new_subpath().
-        ii. else 
+        ii. else
             I. store value of fp.
             II. call check_for_new_path().
     b. else store value of fp.
-6. else 
+6. else
     a. if fp>0:
         i. call right_extension.
     b. else
@@ -90,7 +93,6 @@ Require: array diverge[], user entered flow b
 ```
 
 <br>Any other flow decomposition that is neither an intersecting path nor the updated path itself, such paths remain unchanged and hence are left untouched. By using this approach, we achieve less computation than static algorithm already. This technique helps us to reduce time complexity to the number of safe path changed over m updates = $O(Δp)$.
-
 
 ## Implementation in C++
 
@@ -111,6 +113,7 @@ The above incremental algorithm is implemented using STL by creating a structure
 <p>(vii) new_subpath() and check_for_new_path(): When a safe path breaks into multiple safe path, these multiple safe path are calculated using these two functions. These functions are called until left pointer l crosses last diverging node.</p>
 
 ## Conclusion and Future Works
+
 In this project we saw how we built upon static algorithm and succesfully proposed an incremental algorithm of time complexity $O(Δp)$ by verifying and enumerating maximal safe path, by saving their sufficient conditions, i.e. l,r and fp. The above mentioned algorithm is accurate but has room for improvement left which will be dealt with in future updates. This work can be further extended to a decremental algorithm for computation of safe flow path, which is out of scope of this project.
 
 ## References
