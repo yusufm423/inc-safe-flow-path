@@ -1,6 +1,6 @@
 # Incremental computation of safe flow path
 
-This work is an outcome of my summer research internship under the guidance of Dr. Shahbaz Khan, Asst prof at Deptt of CSE, IIT Roorkee, Roorkee, over a tenure of 2 months (June-July). This repository contains an implementation of the static algorithm, incremental algorithm, a network flow generator and sample input.
+This work is an outcome of my summer research internship under the guidance of Dr. Shahbaz Khan, Asst prof at Deptt of CSE, IIT Roorkee, Roorkee, over a tenure of 2 months from June, 2022 to July, 2022. This repository contains an implementation of the static algorithm, incremental algorithm, a network flow generator and sample input.
 
 ## Introduction
 
