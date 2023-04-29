@@ -29,7 +29,7 @@ Once this is done, each flow decomposition is selected one at a time and a two-p
 **Inflow**: Consider a path $X ={u_1,u_2,...u_k}$ and ${u_i},{u_{i+1}}∈X$, then ***inflow at i*** (i is pointing to ${u_i}$), $f_{in}(u_i)$ = $\sum(v, u_i)$ where ${v}$ is any node in graph but ${v≠u_{i-1}}$<br>
 
 
-**Excess Flow**: $$ fp = \sum_{i=1}^{k-1}f(u_i,u_{i+1}) - \sum_{i=2}^{k-1}f_{out}(u_i) = \sum_{i=1}^{k-1}f(u_i,u_{i+1}) - \sum_{i=2}^{k-1}f_{in}(u_i)$$.
+**Excess Flow**: $$ fp = \sum_{i=1}^{k-1}f(u_i,u_{i+1}) - \sum_{i=2}^{k-1}f_{out}(u_i) = \sum_{i=1}^{k-1}f(u_i,u_{i+1}) - \sum_{i=2}^{k-1}f_{in}(u_i)$$<br>
 For our convinience we define $fpL= \sum_{i=1}^{k-1}f(u_i,u_{i+1}) - \sum_{i=2}^{k-1}f_{in}(u_i)$ differently for but $f_p $ remains same.
 
 ### Verification Aglorithm
@@ -177,6 +177,6 @@ In this project we saw how we built upon static algorithm and succesfully propos
 
 ## References
 
-[1]S. Khan, M. Kortelainen, M. Cáceres, L. Williams, and A. I. Tomescu, “Safety and Completeness in Flow Decompositions for RNA Assembly,” arXiv.org, Jan. 25, 2022. https://arxiv.org/abs/2201.10372 (accessed Aug. 11, 2022).
+[1]S. Khan, M. Kortelainen, M. Cáceres, L. Williams, and A. I. Tomescu, “Safety and Completeness in Flow Decompositions for RNA Assembly,” arXiv.org, Jan. 25, 2022. https://arxiv.org/abs/2201.10372 (accessed Aug. 11, 2022).<br>
 [2]Shao, M., Kingsford, C.: Theory and a heuristic for the minimum path flow decomposition problem. IEEE/ACM
 Transactions on Computational Biology and Bioinformatics 16(2), 658–670 (2017)
