@@ -29,7 +29,7 @@ Once this is done, each flow decomposition is selected one at a time and a two-p
 **Inflow**: Consider a path $X ={u_1,u_2,...u_k}$ and ${u_i},{u_{i+1}}∈X$, then ***inflow at i*** (i is pointing to ${u_i}$), $f_{in}(u_i)$ = $\sum(v, u_i)$ where ${v}$ is any node in graph but ${v≠u_{i-1}}$<br>
 
 
-**Excess Flow**: $ fp = \sum_{i=1}^{k-1}f(u_i,u_{i+1}) - \sum_{i=2}^{k-1}f_{out}(u_i) = \sum_{i=1}^{k-1}f(u_i,u_{i+1}) - \sum_{i=2}^{k-1}f_{in}(u_i)$.
+**Excess Flow**: $$ fp = \sum_{i=1}^{k-1}f(u_i,u_{i+1}) - \sum_{i=2}^{k-1}f_{out}(u_i) = \sum_{i=1}^{k-1}f(u_i,u_{i+1}) - \sum_{i=2}^{k-1}f_{in}(u_i)$$.
 For our convinience we define $fpL= \sum_{i=1}^{k-1}f(u_i,u_{i+1}) - \sum_{i=2}^{k-1}f_{in}(u_i)$ differently for but $f_p $ remains same.
 
 ### Verification Aglorithm
